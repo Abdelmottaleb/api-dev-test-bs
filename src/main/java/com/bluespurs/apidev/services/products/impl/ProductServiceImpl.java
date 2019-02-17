@@ -70,6 +70,10 @@ public class ProductServiceImpl implements ProductService {
 				try {
 
 					// second call (walmart) if the first failed
+					if (null == allproducts) { // in case fnctional exceptionof the firt call (NotFound) where the api
+												// return null => reinitialise the list, we can use Optional ...
+						allproducts = new ArrayList<Product>();
+					}
 					allproducts.addAll(requestService.getListProductsByName(productSearchWalmartUrl, walmartApiKey));
 
 				} catch (Exception e1) {
