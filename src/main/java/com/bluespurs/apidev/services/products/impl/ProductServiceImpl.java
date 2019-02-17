@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.bluespurs.apidev.domain.Product;
 import com.bluespurs.apidev.services.products.ProductService;
+import com.bluespurs.apidev.services.products.exceptions.ProductNotFoundException;
 import com.bluespurs.apidev.services.products.exceptions.TechnicalException;
 import com.bluespurs.apidev.utils.RequestService;
 
@@ -60,17 +61,33 @@ public class ProductServiceImpl implements ProductService {
 
 			allproducts.addAll(requestService.getListProductsByName(productSearchBestBuyUrl, bestBuyApiKey));
 
-		} catch (TechnicalException e) {
+		} catch (Exception e) {
+			log.error(e.getMessage());
 
-			log.error(" first call failed to BestBuy api, proceed to call the walmart api ...{}", e.getMessage());
+			if (e instanceof TechnicalException) {
+				log.error(" first call failed to BestBuy api, proceed to call the walmart api ...{}", e.getMessage());
 
-			try {
+				try {
 
-				allproducts.addAll(requestService.getListProductsByName(productSearchWalmartUrl, walmartApiKey));
+					// second call (walmart) if the first failed
+					allproducts.addAll(requestService.getListProductsByName(productSearchWalmartUrl, walmartApiKey));
 
-			} catch (TechnicalException e1) {
+				} catch (Exception e1) {
+					log.error(e.getMessage());
+					if (e instanceof TechnicalException) {
+						log.error(" second call to walmart api failed too ...{}", e.getMessage());
+					}
+				}
+			}
+		}
 
-				log.error(" second call to walmart api failed to ...{}", e.getMessage());
+		try {
+			// second call if the first succeded without exception
+			allproducts.addAll(requestService.getListProductsByName(productSearchWalmartUrl, walmartApiKey));
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e instanceof TechnicalException) {
+				log.error(" second call to walmart api failed too ...{}", e.getMessage());
 			}
 		}
 

@@ -36,7 +36,7 @@ public class RequestService {
 		this.productName = productName;
 	}
 
-	public List<Product> getListProductsByName(String url, String apiKey) throws TechnicalException {
+	public List<Product> getListProductsByName(String url, String apiKey) throws TechnicalException, ProductNotFoundException {
 
 		log.debug("search products list from for Best Buy for : {} ", productName);
 
