@@ -24,7 +24,7 @@ public class ProductController extends AbstractController {
 		this.productService = productService;
 	}
 
-	@GetMapping("/{name}")
+	@GetMapping("/search")
 	public ResponseEntity<Product> getLowestCurrentAvailablePrice(@RequestParam("name") final String productName) {
 
 		/** here we put our web logic **/
